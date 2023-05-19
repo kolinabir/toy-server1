@@ -9,7 +9,7 @@ app.use(express.json());
 //
 //
 
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.z0ckcxg.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -35,17 +35,21 @@ async function run() {
     app.get("/toys/:text", async (req, res) => {
       console.log(req.params.text); // Log the filter text received in the request parameters
 
-      if (req.params.text == "Speed" || req.params.text == "Retro" || req.params.text == "Off-Road") {
+      if (
+        req.params.text == "Speed" ||
+        req.params.text == "Retro" ||
+        req.params.text == "Off-Road"
+      ) {
         // If the filter is "remote" or "offline", find jobs with matching status
         const result = await toysCollection
           .find({ subcategory: req.params.text }) // Query the jobs collection with the specified status
           .toArray(); // Convert the result to an array
         return res.send(result); // Send the matching jobs as the response
+      } else {
+        const query = { _id: new ObjectId(req.params.text) };
+        const user = await toysCollection.findOne(query);
+        res.send(user);
       }
-
-      // If the filter is not "remote" or "offline", return all jobs
-      const result = await toysCollection.find({}).toArray(); // Retrieve all jobs from the collection
-      res.send(result); // Send all jobs as the response
 
       // res.send(result)
     });
