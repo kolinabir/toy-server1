@@ -31,6 +31,16 @@ async function run() {
       console.log(result);
       res.send(result);
     });
+    app.post("/toys", async (req, res) => {
+      const toy = req.body;
+				//if (!toy {
+			    //     return res.status(404).send({message:"body data not found"})
+			    //   }
+      console.log("new toy", toy);
+      const result = await toysCollection.insertOne(toy);
+      res.send(result);
+    });
+
 
     app.get("/toys/:text", async (req, res) => {
       console.log(req.params.text); // Log the filter text received in the request parameters
