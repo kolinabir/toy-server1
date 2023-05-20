@@ -33,18 +33,17 @@ async function run() {
     });
     app.post("/toys", async (req, res) => {
       const toy = req.body;
-				//if (!toy {
-			    //     return res.status(404).send({message:"body data not found"})
-			    //   }
+      //if (!toy {
+      //     return res.status(404).send({message:"body data not found"})
+      //   }
       console.log("new toy", toy);
       const result = await toysCollection.insertOne(toy);
       res.send(result);
     });
 
-
     app.get("/toys/:text", async (req, res) => {
       console.log(req.params.text); // Log the filter text received in the request parameters
-
+      //to get data by specific category
       if (
         req.params.text == "Speed" ||
         req.params.text == "Retro" ||
@@ -56,12 +55,25 @@ async function run() {
           .toArray(); // Convert the result to an array
         return res.send(result); // Send the matching jobs as the response
       } else {
+        //to get data by specific id
         const query = { _id: new ObjectId(req.params.text) };
         const user = await toysCollection.findOne(query);
         res.send(user);
       }
-
       // res.send(result)
+    });
+
+    app.get("/toys/seller/:email", async (req, res) => {
+      console.log(req.params.email); // Log the email received in the request parameters
+      const query = { sellerEmail: req.params.email };
+
+      try {
+        const toys = await toysCollection.find(query).toArray();
+        res.send(toys);
+      } catch (error) {
+        console.error("Error querying MongoDB:", error);
+        res.status(500).send("Error querying MongoDB");
+      }
     });
 
     // Send a ping to confirm a successful connection
