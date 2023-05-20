@@ -66,7 +66,6 @@ async function run() {
     app.get("/toys/seller/:email", async (req, res) => {
       console.log(req.params.email); // Log the email received in the request parameters
       const query = { sellerEmail: req.params.email };
-
       try {
         const toys = await toysCollection.find(query).toArray();
         res.send(toys);
@@ -98,6 +97,36 @@ async function run() {
       );
       res.send(result);
     });
+    app.delete('/toys/:id', async(req,res)=>{
+      const id =  req.params.id;
+      const query ={_id : new ObjectId(id)}
+      const result = await toysCollection.deleteOne(query)
+      res.send(result)
+  })
+  app.get("/toys/orderAc/:email", async (req, res) => {
+    console.log(req.params.email); // Log the email received in the request parameters
+    const query = { sellerEmail: req.params.email };
+    try {
+      const toys = await toysCollection.find(query).sort({ price: 1 }).toArray();
+      res.send(toys);
+    } catch (error) {
+      console.error("Error querying MongoDB:", error);
+      res.status(500).send("Error querying MongoDB");
+    }
+  });
+  app.get("/toys/orderDc/:email", async (req, res) => {
+    console.log(req.params.email); // Log the email received in the request parameters
+    const query = { sellerEmail: req.params.email };
+    try {
+      const toys = await toysCollection.find(query).sort({ price: -1 }).toArray();
+      res.send(toys);
+    } catch (error) {
+      console.error("Error querying MongoDB:", error);
+      res.status(500).send("Error querying MongoDB");
+    }
+  });
+  
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
